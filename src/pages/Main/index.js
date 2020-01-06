@@ -12,6 +12,7 @@ export default class Main extends Component {
     newRepo: '',
     repositories: [],
     loading: false,
+    error: false,
   };
 
   componentDidMount() {
@@ -35,37 +36,51 @@ export default class Main extends Component {
 
   handleSubmit = async e => {
     e.preventDefault();
-    this.setState({ loading: true });
+    try {
+      this.setState({ loading: true });
 
-    const { newRepo, repositories } = this.state;
-    const response = await api.get(`/repos/${newRepo}`);
+      const { newRepo, repositories } = this.state;
+      const response = await api.get(`/repos/${newRepo}`);
 
-    const data = {
-      name: response.data.full_name,
-    };
-    this.setState({
-      repositories: [...repositories, data],
-      newRepo: '',
-      loading: false,
-    });
+      const data = {
+        name: response.data.full_name,
+      };
+
+      const repoExist = repositories.filter(repo => repo.name === data.name);
+      if (repoExist.length > 0) {
+        throw new Error('Repositório duplicado');
+      }
+
+      this.setState({
+        repositories: [...repositories, data],
+        newRepo: '',
+        loading: false,
+        error: false,
+      });
+    } catch (err) {
+      this.setState({
+        loading: false,
+        error: true,
+      });
+    }
   };
 
   render() {
-    const { newRepo, loading, repositories } = this.state;
+    const { newRepo, loading, repositories, error } = this.state;
     return (
       <Container>
         <h1>
           <FaGithubAlt />
           Repositórios
         </h1>
-        <Form onSubmit={this.handleSubmit}>
+        <Form teste="0" onSubmit={this.handleSubmit} error={error ? 1 : 0}>
           <input
             type="text"
             placeholder="Adicionar repositório"
             value={newRepo}
             onChange={this.handleInputChange}
           />
-          <SubmitButton loading={loading}>
+          <SubmitButton loading={loading ? 1 : 0}>
             {loading ? (
               <FaSpinner color="#FFF" size={14} />
             ) : (
