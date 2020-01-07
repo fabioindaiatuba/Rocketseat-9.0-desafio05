@@ -5,13 +5,15 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, IssueList } from './styles';
+import { Loading, Owner, StatusList, IssueList } from './styles';
 
 export default class Repository extends Component {
   state = {
     repository: {},
     issues: [],
     loading: true,
+    status: 'open',
+    statusList: ['open', 'closed', 'all'],
   };
 
   async componentDidMount() {
@@ -19,11 +21,13 @@ export default class Repository extends Component {
 
     const repoName = decodeURIComponent(match.params.repository);
 
+    const { status } = this.state;
+
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
-          state: 'open',
+          state: status,
           per_pages: 5,
         },
       }),
@@ -36,8 +40,25 @@ export default class Repository extends Component {
     });
   }
 
+  handleRadioChange = async e => {
+    const status = e.target.value;
+    const { repository } = this.state;
+
+    const issues = await api.get(`/repos/${repository.full_name}/issues`, {
+      params: {
+        state: status,
+        per_pages: 5,
+      },
+    });
+
+    this.setState({
+      status,
+      issues: issues.data,
+    });
+  };
+
   render() {
-    const { repository, issues, loading } = this.state;
+    const { repository, issues, loading, statusList, status } = this.state;
 
     if (loading) {
       return <Loading>Carregando...</Loading>;
@@ -49,8 +70,23 @@ export default class Repository extends Component {
           <img src={repository.owner.avatar_url} alt={repository.owner.login} />
           <h1>{repository.name}</h1>
           <p>{repository.description}</p>
+          <StatusList id="testeForm">
+            <span>Filtrar por status: </span>
+            {statusList.map(st => (
+              <div key={st}>
+                <input
+                  type="radio"
+                  id={status}
+                  name="status"
+                  checked={st === status}
+                  value={st}
+                  onChange={this.handleRadioChange}
+                />
+                <label htmlFor={status}>{st}</label>
+              </div>
+            ))}
+          </StatusList>
         </Owner>
-
         <IssueList>
           {issues.map(issue => (
             <li key={String(issue.id)}>

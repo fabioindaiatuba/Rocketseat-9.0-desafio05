@@ -42,6 +42,39 @@ export const Owner = styled.header`
   }
 `;
 
+export const StatusList = styled.form`
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  span {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 15px;
+    color: #7159c1;
+  }
+
+  div {
+    input {
+      background: #7159c1;
+
+      &[checked] {
+        background: #7159c1;
+        border: 4px solid #333;
+      }
+    }
+
+    label {
+      margin-right: 10px;
+      margin-left: 2px;
+      font-size: 16px;
+      color: #333;
+    }
+  }
+`;
+
 export const IssueList = styled.ul`
   padding-top: 30px;
   margin-top: 30px;

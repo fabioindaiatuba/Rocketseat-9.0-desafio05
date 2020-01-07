@@ -73,7 +73,7 @@ export default class Main extends Component {
           <FaGithubAlt />
           Repositórios
         </h1>
-        <Form teste="0" onSubmit={this.handleSubmit} error={error ? 1 : 0}>
+        <Form onSubmit={this.handleSubmit} error={error ? 1 : 0}>
           <input
             type="text"
             placeholder="Adicionar repositório"
