@@ -148,7 +148,6 @@ export const MoveButtons = styled.div`
     padding: 8px;
     outline: 0;
     border: 0;
-    transition: opacity 0.25s ease-out;
 
     &:disabled {
       opacity: 0.35;
