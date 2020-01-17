@@ -2,7 +2,7 @@
 
 ## ReactJS - Criando Interface Repositorios Git favoritos e sua issues.
 
-![Tela01](https://github.com/fabioindaiatuba/Rocketseat-9.0-desafio04/blob/master/snapshots/snapshot01.png)
+![Tela01](https://github.com/fabioindaiatuba/Rocketseat-9.0-desafio05/blob/master/snapshots/snapshot01.jpg)
 
 ### Funções Modulo 05:
 * Configurações iniciais com Webpack, Babel, Webpack Dev Server e ReactJS.
