@@ -133,3 +133,26 @@ export const IssueList = styled.ul`
     }
   }
 `;
+
+export const MoveButtons = styled.div`
+  padding-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+
+  button {
+    background: #7159c1;
+    color: #fff;
+    border-radius: 4px;
+    padding: 8px;
+    outline: 0;
+    border: 0;
+    transition: opacity 0.25s ease-out;
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+`;

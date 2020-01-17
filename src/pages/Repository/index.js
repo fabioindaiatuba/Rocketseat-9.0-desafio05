@@ -5,15 +5,17 @@ import { Link } from 'react-router-dom';
 import api from '../../services/api';
 
 import Container from '../../components/Container';
-import { Loading, Owner, StatusList, IssueList } from './styles';
+import { Loading, Owner, StatusList, IssueList, MoveButtons } from './styles';
 
 export default class Repository extends Component {
   state = {
     repository: {},
     issues: [],
     loading: true,
-    status: 'open',
-    statusList: ['open', 'closed', 'all'],
+    status: 'all',
+    statusList: ['all', 'open', 'closed'],
+    perPage: 3,
+    page: 1,
   };
 
   async componentDidMount() {
@@ -21,14 +23,15 @@ export default class Repository extends Component {
 
     const repoName = decodeURIComponent(match.params.repository);
 
-    const { status } = this.state;
+    const { status, perPage, page } = this.state;
 
     const [repository, issues] = await Promise.all([
       api.get(`/repos/${repoName}`),
       api.get(`/repos/${repoName}/issues`, {
         params: {
           state: status,
-          per_pages: 5,
+          per_page: perPage,
+          page,
         },
       }),
     ]);
@@ -40,25 +43,50 @@ export default class Repository extends Component {
     });
   }
 
-  handleRadioChange = async e => {
-    const status = e.target.value;
-    const { repository } = this.state;
+  loadIssues = async () => {
+    const { repository, status, perPage, page } = this.state;
 
     const issues = await api.get(`/repos/${repository.full_name}/issues`, {
       params: {
         state: status,
-        per_pages: 5,
+        per_page: perPage,
+        page,
       },
     });
 
     this.setState({
-      status,
       issues: issues.data,
     });
   };
 
+  handleMovePage = move => {
+    const { page } = this.state;
+    if (move === 'next') {
+      this.setState({ page: page + 1 });
+    } else if (page > 1) {
+      this.setState({ page: page - 1 });
+    }
+
+    this.loadIssues();
+  };
+
+  handleRadioChange = async e => {
+    const status = e.target.value;
+
+    await this.setState({ status, page: 1 });
+
+    this.loadIssues();
+  };
+
   render() {
-    const { repository, issues, loading, statusList, status } = this.state;
+    const {
+      repository,
+      issues,
+      loading,
+      statusList,
+      status,
+      page,
+    } = this.state;
 
     if (loading) {
       return <Loading>Carregando...</Loading>;
@@ -76,7 +104,7 @@ export default class Repository extends Component {
               <div key={st}>
                 <input
                   type="radio"
-                  id={status}
+                  id={st}
                   name="status"
                   checked={st === status}
                   value={st}
@@ -103,6 +131,19 @@ export default class Repository extends Component {
             </li>
           ))}
         </IssueList>
+        <MoveButtons>
+          <button
+            type="button"
+            disabled={page < 2}
+            onClick={() => this.handleMovePage('back')}
+          >
+            Anterior
+          </button>
+          <span>Página {page}</span>
+          <button type="button" onClick={() => this.handleMovePage('next')}>
+            Próximo
+          </button>
+        </MoveButtons>
       </Container>
     );
   }
